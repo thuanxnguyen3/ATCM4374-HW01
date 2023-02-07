@@ -4,53 +4,46 @@ using UnityEngine;
 
 public abstract class PowerUpBase : MonoBehaviour
 {
-    protected float PowerupDuration;
-    protected float StartDuration;
+    protected float PowerupDuration = 0f;
     [SerializeField] protected GameObject _visuals;
     [SerializeField] protected Collider _collider;
-
     protected abstract void PowerUp();
     protected abstract void PowerDown();
-    
 
     private void OnTriggerEnter(Collider other)
     {
         Projectile projectile = other.GetComponent<Projectile>();
         if (projectile != null)
         {
-            StartCoroutine(PowerupTime());
-            if (StartDuration == PowerupDuration)
-            {
-                PowerDown();
-                Debug.Log("powerdown");
-                Destroy(gameObject);
-            }
+
+            VisualAndCollider();
+            Debug.Log("start powerup");
+            PowerUp();
+            Invoke("TrackPowerUp", PowerupDuration);
+
         }
     }
 
-    private IEnumerator PowerupTime()
+    private void TrackPowerUp()
     {
-        VisualAndCollider();
-        PowerUp();
-        yield return new WaitUntil(() => StartDuration == PowerupDuration);
+
+        PowerDown();
+        Destroy(gameObject);
 
     }
+
     protected void VisualAndCollider()
     {
         _visuals.SetActive(false);
         _collider.enabled = false;
     }
 
-    private void Update()
-    {
-        if (StartDuration < PowerupDuration)
-        {
-            StartDuration += Time.deltaTime;
-        }
-        
-    }
 
 
 
 
 }
+
+
+
+
